@@ -85,26 +85,27 @@ const SalaryRecordsDataTable = ({ salaryRecords, setSalaryRecords }) => {
           setError={setError}
           setSuccess={setSuccess}
         />
-        <div className="flex justify-end py-4">
-          <Input
-            className="w-full mr-4 sm:w-1/2 md:w-1/3"
-            onChange={(e) => setDate(e.target.value)}
-            type="date"
-          />
-          {error.length > 0 ? <span>{error}</span> : ""}
-          <Btn
-            className="bg-teal-500 hover:bg-teal-600"
-            onClick={generateSalaryRecords}
-          >
-            Generate
-          </Btn>
-        </div>
 
         <DataTable
           data={salaryRecords}
           rowClick={() => console.log()}
           columns={columns}
-        />
+        >
+          <div className="flex items-center justify-end w-full py-4">
+            <Input
+              className="w-full mr-4 sm:w-1/2 md:w-1/3"
+              onChange={(e) => setDate(e.target.value)}
+              type="date"
+            />
+            {error.length > 0 ? <span>{error}</span> : ""}
+            <Btn
+              className="mt-0 bg-teal-500 hover:bg-teal-600"
+              onClick={generateSalaryRecords}
+            >
+              Generate
+            </Btn>
+          </div>
+        </DataTable>
       </TableContainer>
     </>
   );

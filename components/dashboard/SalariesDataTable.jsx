@@ -27,20 +27,17 @@ const SalariesDataTable = ({ salaries, setSalaries }) => {
   // this is required because if we submit empty form we are getting error but status is stil 200:OK
   const checkIfFormIsValid = () => {
     let errorCount = 0;
-    [
-      "basic_salary",
-      "commitment_bonus",
-      "allowance",
-      "festival_bonus",
-    ].forEach((field) => {
-      if (salary[field] === undefined) {
-        errorCount += 1;
-        setErrors({ ...errors, [field]: "Can't be blank." });
-      } else if (!String(salary[field]).match(numberRegEx)) {
-        errorCount += 1;
-        setErrors({ ...errors, [field]: "Must be a number." });
+    ["basic_salary", "commitment_bonus", "allowance", "festival_bonus"].forEach(
+      (field) => {
+        if (salary[field] === undefined) {
+          errorCount += 1;
+          setErrors({ ...errors, [field]: "Can't be blank." });
+        } else if (!String(salary[field]).match(numberRegEx)) {
+          errorCount += 1;
+          setErrors({ ...errors, [field]: "Must be a number." });
+        }
       }
-    });
+    );
 
     return errorCount;
   };
@@ -74,20 +71,20 @@ const SalariesDataTable = ({ salaries, setSalaries }) => {
   return (
     <>
       <TableContainer>
-        <div className="flex justify-end py-4">
-          <Btn
-            className="bg-teal-500 hover:bg-teal-600"
-            onClick={creatingNewSalary}
-          >
-            New Salary
-          </Btn>
-        </div>
-
         <DataTable
           data={salaries}
           rowClick={() => console.log()}
           columns={columns}
-        />
+        >
+          <div className="flex justify-end py-4">
+            <Btn
+              className="bg-teal-500 hover:bg-teal-600"
+              onClick={creatingNewSalary}
+            >
+              New Salary
+            </Btn>
+          </div>
+        </DataTable>
       </TableContainer>
       {createNewSalary && (
         <Modal

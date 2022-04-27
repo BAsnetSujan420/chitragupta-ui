@@ -173,12 +173,6 @@ const SalariesDataTable = ({ salarySettings, setSalarySettings }) => {
   return (
     <>
       <TableContainer>
-        <div className="flex justify-end py-4">
-          <Btn className="bg-teal-500 hover:bg-teal-600" onClick={creatingNew}>
-            New Salary Setting
-          </Btn>
-        </div>
-
         <DataTable
           data={salarySettings}
           rowClick={(row) => {
@@ -188,7 +182,16 @@ const SalariesDataTable = ({ salarySettings, setSalarySettings }) => {
             setUpdatingSalarySetting(true);
           }}
           columns={columns}
-        />
+        >
+          <div className="flex justify-end py-4">
+            <Btn
+              className="bg-teal-500 hover:bg-teal-600"
+              onClick={creatingNew}
+            >
+              New Salary Setting
+            </Btn>
+          </div>
+        </DataTable>
       </TableContainer>
 
       {createNew && (

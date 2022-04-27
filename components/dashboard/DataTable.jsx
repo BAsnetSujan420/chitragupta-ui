@@ -1,8 +1,34 @@
-import React from "react";
-import { useTable, useSortBy, usePagination } from "react-table";
+import React, { useState } from "react";
+import {
+  useTable,
+  useSortBy,
+  usePagination,
+  useGlobalFilter,
+  useAsyncDebounce,
+} from "react-table";
+import { Input } from "../formComponents";
+
+function GlobalFilter({ globalFilter, setGlobalFilter }) {
+  const [value, setValue] = useState(globalFilter);
+  const onChange = useAsyncDebounce((value) => {
+    setGlobalFilter(value || undefined);
+  }, 200);
+
+  return (
+    <div>
+      <Input
+        value={value || ""}
+        onChange={(e) => {
+          setValue(e.target.value);
+          onChange(e.target.value);
+        }}
+        placeholder={`Search`}
+      />
+    </div>
+  );
+}
 
 const DataTable = ({ children, data, rowClick, columns }) => {
-
   const {
     getTableProps,
     getTableBodyProps,
@@ -15,11 +41,13 @@ const DataTable = ({ children, data, rowClick, columns }) => {
     pageOptions,
     state,
     prepareRow,
+    setGlobalFilter,
   } = useTable(
     {
       columns,
       data: data,
     },
+    useGlobalFilter,
     useSortBy,
     usePagination
   );
@@ -28,7 +56,13 @@ const DataTable = ({ children, data, rowClick, columns }) => {
 
   return (
     <div className="relative">
-      { children }
+      <div className="flex items-center justify-between ">
+        <GlobalFilter
+          globalFilter={state.globalFilter}
+          setGlobalFilter={setGlobalFilter}
+        />
+        {children}
+      </div>
       <table
         {...getTableProps()}
         className="min-w-full divide-y divide-gray-200"

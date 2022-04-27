@@ -72,9 +72,9 @@ const UsersDataTable = () => {
       }
       {users && (
         <DataTable data={users} rowClick={rowClick} columns={columns}>
-          <div className="flex justify-between my-4">
+          <div className="my-4">
             <Btn
-              className="bg-teal-500 hover:bg-teal-600"
+              className="mr-4 bg-teal-500 hover:bg-teal-600"
               onClick={() => document.getElementById("file-upload").click()}
             >
               Bulk Upload

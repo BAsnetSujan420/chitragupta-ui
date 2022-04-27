@@ -5,7 +5,7 @@ import axios from "axios";
 import Jsona from "jsona";
 import { handleUnauthorized } from "../../../lib/utils";
 import { useGlobalContext } from "../../../context";
-import { useRouter } from "router";
+import { useRouter } from "next/router";
 
 const salarySettings = () => {
   const router = useRouter();
