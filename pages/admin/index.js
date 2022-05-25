@@ -27,6 +27,11 @@ function Admin({ user, loading }) {
       description: 'View and manage salary records',
       link: '/admin/salaryRecords',
     },
+    {
+      topic: 'Yearly Salary Records',
+      description: 'View and manage yearly salary records',
+      link: '/admin/yearlySalaryRecords'
+    }
   ];
 
   return user && !loading && user.role === 'admin' ? (
