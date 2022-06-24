@@ -1,6 +1,6 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
-  reactStrictMode: true
+  reactStrictMode: true,
 };
 
 const withTM = require('next-transpile-modules')([
@@ -8,7 +8,8 @@ const withTM = require('next-transpile-modules')([
   '@babel/preset-react',
   '@fullcalendar/common',
   '@fullcalendar/daygrid',
-  '@fullcalendar/react'
+  '@fullcalendar/react',
+  '@fullcalendar/interaction',
 ]);
 
 module.exports = withTM({

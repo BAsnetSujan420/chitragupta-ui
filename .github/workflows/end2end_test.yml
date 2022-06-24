@@ -1,0 +1,23 @@
+name: Chitragupra Tests
+
+on: [push]
+
+jobs:
+  cypress-run:
+    runs-on: ubuntu-18.04
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v2
+      # Install NPM dependencies, cache them correctly
+      # and run all Cypress tests
+      - name: Cypress run
+        uses: cypress-io/github-action@v4
+        with:
+          build: yarn build
+          start: yarn start
+          record: true
+        env:
+          NEXT_PUBLIC_REMOTE_URL: 'https://chitragupta101.herokuapp.com'
+          NEXT_PUBLIC_CAPTCHA_SITE_KEY: ${{ secrets.RECAPTCHA_KEY }}
+          CYPRESS_RECORD_KEY: ${{ secrets.CYPRESS_RECORD_KEY }}
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
