@@ -25,7 +25,7 @@ inline-block py-2 px-4 text-sm font-semibold text-center text-white transition b
 `;
 
 export const Select = tw.select`
-block appearance-none w-full bg-gray-200 border text-gray-700 py-3 px-4 pr-8 rounded leading-tight focus:outline-none focus:bg-white focus:border-gray-500
+mt-1 block w-full pl-3 pr-10 py-2 text-base border-gray-300 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm rounded-md
 `;
 
 export const Option = tw.option`
