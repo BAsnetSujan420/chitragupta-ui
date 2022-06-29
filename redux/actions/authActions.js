@@ -9,8 +9,9 @@ import {
   LOGOUT_SUCCESS,
   SET_TOKEN,
   UNSET_TOKEN,
-  SET_IS_SERVER,
+  SET_IS_SERVER, SET_REDIRECT, RESET_REDIRECT,
 } from './types'
+import { getCaptchaScore } from "../../lib/utils";
 
 //* set initial token on page access
 export const setToken = (token) => (dispatch, getState) => {
@@ -47,7 +48,7 @@ export const loadUser = () => (dispatch, getState) => {
 //* log in user
 export const login =
   ({ email, password }) =>
-  (dispatch) => {
+  async (dispatch) => {
     // headers
     const config = {
       headers: {
@@ -56,28 +57,33 @@ export const login =
     }
     // request body
     const body = JSON.stringify({ user: { email, password } })
-    axios
-      .post(
-        `${process.env.NEXT_PUBLIC_REMOTE_URL}/users/sign_in.json`,
-        body,
-        config,
-      )
-      .then((res) => {
-        dispatch(clearErrors())
-        dispatch(
-          returnAlerts('Logged in successfully', res.status, 'LOGIN_SUCCESS'),
-        )
-        dispatch({ type: LOGIN_SUCCESS, payload: res })
-        dispatch({ type: SET_TOKEN, payload: res.headers.authorization })
-      })
-      .catch((err) => {
-        dispatch(
-          returnErrors(err.response.data, err.response.status, 'LOGIN_FAIL'),
-        )
-        dispatch({
-          type: LOGIN_FAIL,
-        })
-      })
+    const score = await getCaptchaScore()
+    if (score > 0.6) {
+      axios
+          .post(
+              `${process.env.NEXT_PUBLIC_REMOTE_URL}/users/sign_in.json`,
+              body,
+              config,
+          )
+          .then((res) => {
+            dispatch(clearErrors())
+            dispatch(
+                returnAlerts('Logged in successfully', res.status, 'LOGIN_SUCCESS'),
+            )
+            dispatch({ type: LOGIN_SUCCESS, payload: res })
+            dispatch({ type: SET_TOKEN, payload: res.headers.authorization })
+          })
+          .catch((err) => {
+            dispatch(
+                returnErrors(err.response.data, err.response.status, 'LOGIN_FAIL'),
+            )
+            dispatch({
+              type: LOGIN_FAIL,
+            })
+          })
+    } else {
+      dispatch(returnErrors("Are you a robot?", 400, "CAPTCHA_FAILED"))
+    }
   }
 
 //* logout user
@@ -98,6 +104,116 @@ export const logout = () => (dispatch, getState) => {
         returnErrors(err.response.data, err.response.status, 'LOGOUT_FAIL'),
       )
     })
+}
+
+export const invitationFormSubmit = (email) => async (dispatch, getState) => {
+  try {
+    const score = await getCaptchaScore();
+
+    if (score > 0.6) {
+      try {
+        const response = await axios.post(
+            `${process.env.NEXT_PUBLIC_REMOTE_URL}/api/v1/invite.json`,
+            {
+              email,
+            },
+            { headers: { Authorization: getState().auth.token } }
+        );
+
+        if (response.statusText === "OK") {
+          dispatch(returnAlerts(
+              response.data && response.data.message,
+              response.status
+          ));
+        } else {
+          dispatch(returnErrors(
+              response.data.message || response.data.error,
+              response.status
+          ));
+        }
+      } catch (error) {
+        dispatch(returnErrors(
+            error.response.data.message || error.response.data.error,
+            error.response.status
+        ));
+      }
+    } else {
+      dispatch(returnErrors(
+          "Are you a robot?",
+          404
+      ));
+    }
+  } catch (error) {
+    dispatch(returnErrors(
+        error.response.data.message || error.response.data.error,
+        error.response.status
+    ));
+    console.log(error)
+  }
+}
+
+export const acceptInvitation = (invitation_token , password, passwordConfirmation) => async (dispatch) => {
+  if (password.length < 8) {
+    dispatch(returnErrors(
+        "Password length must be greater than 8.",
+        404
+    ))
+    return;
+  } else if (password !== passwordConfirmation) {
+    dispatch(returnErrors(
+        "Password and confirmation does not match...",
+        404
+    ))
+    return;
+  }
+
+  try {
+    const score = await getCaptchaScore();
+    if (score > 0.6) {
+      const response = await axios.put(
+          `${process.env.NEXT_PUBLIC_REMOTE_URL}/users/invitation.json`,
+          {
+            user: {
+              invitation_token,
+              password,
+              password_confirmation: passwordConfirmation,
+            },
+          }
+      );
+
+      if (response.statusText === "OK") {
+        // set localstorage token
+        localStorage.setItem(
+            "token",
+            `Bearer ${response.headers.authorization}`
+        );
+        // set user id
+        localStorage.setItem("user_id", response.data.user.id);
+        // redirect to page where user will fill rest of the info
+        dispatch({
+          type: SET_REDIRECT,
+          payload: "/users/profile_form"
+        })
+      } else {
+        // show error message
+        dispatch(returnErrors(
+            "Failed to set password",
+            404
+        ))
+      }
+    }
+  } catch (error) {
+    dispatch(returnErrors(
+        error.message,
+        404
+    ))
+  }
+}
+
+export const resetRedirect = () => (dispatch) => {
+  dispatch({
+    type: RESET_REDIRECT
+  })
 }
 
 //! setup config headers and token

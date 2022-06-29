@@ -5,7 +5,7 @@ import Navbar from '../../components/layout/Navbar'
 import { Btn } from '../../components/formComponents'
 import Loader from '../../components/ui/loader'
 
-function Admin({ user, loading }) {
+const Admin = ({ user, loading }) => {
   const adminPages = [
     {
       topic: 'User',
@@ -43,6 +43,11 @@ function Admin({ user, loading }) {
       link: '/admin/jobApplicant',
     },
 
+    {
+      topic: 'Invite User',
+      description: 'Invite new users to the organization',
+      link: '/users/invite_form',
+    }
   ]
 
   return user && !loading && user.role === 'admin' ? (

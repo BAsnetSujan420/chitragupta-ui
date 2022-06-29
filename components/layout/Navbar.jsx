@@ -10,7 +10,7 @@ import {
 } from '../dropdownComponents';
 import { logout } from '../../redux/actions/authActions';
 
-function Navbar(props) {
+const Navbar = (props) => {
   const [showDropdown, setShowDropDown] = useState(false);
 
   const isAdmin = () => props.user && props.user.role === 'admin';
@@ -106,8 +106,8 @@ function Navbar(props) {
             </div>
           </li>
 
-          {subPages.map((subPage, index) => (
-            <li aria-current="page" key={index}>
+          {subPages.map((subPage) => (
+            <li aria-current="page" key={subPage.label}>
               <div className="flex items-center">
                 <svg
                   className="w-5 h-5 text-white-400"

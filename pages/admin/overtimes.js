@@ -1,13 +1,11 @@
 import Navbar from '../../components/layout/Navbar'
 import OvertimesDataTable from '../../components/dashboard/OvertimesDataTable'
 
-function Overtime() {
-  return (
+const Overtime = () => (
     <>
-      <Navbar />
-      <OvertimesDataTable />
+        <Navbar />
+        <OvertimesDataTable />
     </>
-  )
-}
+)
 
 export default Overtime

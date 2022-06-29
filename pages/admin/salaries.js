@@ -1,13 +1,11 @@
 import Navbar from '../../components/layout/Navbar';
 import SalariesDataTable from '../../components/dashboard/SalariesDataTable';
 
-function Salaries() {
-  return (
+const Salaries = () => (
     <>
-      <Navbar />
-      <SalariesDataTable />
+        <Navbar />
+        <SalariesDataTable />
     </>
-  );
-}
+)
 
 export default Salaries;

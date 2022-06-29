@@ -1,7 +1,5 @@
 import { useEffect, useState } from 'react'
 import { connect } from 'react-redux'
-import axios from 'axios'
-import Jsona from 'jsona'
 import AsyncSelect from 'react-select/async'
 import DataTable from './DataTable'
 import { columns } from '../../data/overtimeTableData'
@@ -11,19 +9,19 @@ import {
 } from '../../redux/actions/dashboardActions'
 import { createOvertime } from '../../redux/actions/overtimeActions'
 import Modal from '../modal'
-import { Btn, Input, Label } from '../formComponents'
+import { Btn, Label } from '../formComponents'
 import InputWithLabelAndError from '../InputWithLabelAndError'
 import { TableContainer } from '../modalComponents'
+import { searchRequest, fetchUsers } from "../../lib/queries";
 
-function OvertimesDataTable({
+const OvertimesDataTable = ({
   fetchOvertimes,
   createOvertime,
   setShowModal,
   approver,
   showModal,
-}) {
+}) => {
   const isAdmin = () => approver && approver.role === 'admin'
-  const dataFormatter = new Jsona()
   const numberRegEx = /^\d*$/
 
   // const [showModal, setShowModal] = useState(false)
@@ -33,54 +31,13 @@ function OvertimesDataTable({
   const [userOptions, setUserOptions] = useState([])
   const [errors, setErrors] = useState({})
 
-  const searchRequest = async (query) => {
-    console.log('Searching')
-    try {
-      const response = await axios.get(
-        `${process.env.NEXT_PUBLIC_REMOTE_URL}/api/v1/users.json`,
-        {
-          headers: {
-            Authorization: localStorage.token,
-            'Content-type': 'application/json',
-          },
-          params: { search: query },
-        },
-      )
-
-      const users = dataFormatter.deserialize(response.data.data)
-      const updatedUserOptions = users.map((user) => ({
-        value: user.id,
-        label: `${user.first_name} ${user.last_name}`,
-      }))
-
-      setUserOptions(updatedUserOptions)
-      return updatedUserOptions
-    } catch (error) {
-      console.log(error)
-      return []
-    }
-  }
-
   useEffect(() => {
-    const fetchUsers = async () => {
-      try {
-        const response = await axios.get(
-          `${process.env.NEXT_PUBLIC_REMOTE_URL}/api/v1/users.json`,
-          { headers: { Authorization: localStorage.token } },
-        )
-        const users = dataFormatter.deserialize(response.data.data)
-        setUserOptions(
-          users.map((user) => ({
-            value: user.id,
-            label: `${user.first_name} ${user.last_name}`,
-          })),
-        )
-      } catch (error) {
-        console.log(error)
-      }
+    const setOptions = async () => {
+      const users = await fetchUsers()
+      setUserOptions(users)
     }
 
-    fetchUsers()
+    setOptions()
   }, [])
 
   return (
@@ -127,7 +84,6 @@ function OvertimesDataTable({
               setOvertime({ ...overtime, user_id: e.value })
             }}
             defaultOptions={userOptions}
-            // onInputChange={(query) => searchRequest(query)}
             loadOptions={(query) => searchRequest(query)}
           />
           <Btn

@@ -2,7 +2,6 @@ import axios from 'axios'
 import Jsona from 'jsona'
 import {
   GET_LEAVE_REQUESTS,
-  ADD_LEAVE_REQUEST,
   UPDATE_LEAVE_REQUEST,
   SET_SELECTED_LEAVE,
   LEAVE_REQUESTS_LOADING,
@@ -11,6 +10,7 @@ import {
 } from './types'
 import { returnErrors, returnAlerts, clearErrors } from './alertActions'
 import { tokenConfig } from './authActions'
+import {setNewModal, setUpdateModal} from "./modalActions";
 
 const dataFormatter = new Jsona()
 
@@ -36,11 +36,7 @@ export const addLeaveRequest = () => (dispatch, getState) => {
       tokenConfig(getState),
     )
     .then((res) => {
-      dispatch({
-        type: ADD_LEAVE_REQUEST,
-        payload: dataFormatter.deserialize(res.data),
-      })
-      dispatch(setLeaveModal(false))
+      dispatch(setNewModal(false))
       dispatch(
         returnAlerts(
           'Leave Request Added Successfully',
@@ -111,7 +107,8 @@ export const getLeaveById = (id) => (dispatch, getState) => {
 export const updateLeaveRequest = () => (dispatch, getState) => {
   // get currently selected leave
   const leave_request = getState().leave.selectedLeave
-  const body = JSON.stringify({ leave_request })
+  const current_user = getState().auth.user
+  const body = JSON.stringify({ leave_request: { ...leave_request, approver_id: current_user.id } })
   axios
     .put(
       `${process.env.NEXT_PUBLIC_REMOTE_URL}/api/v1/leave_requests/${leave_request.id}.json`,
@@ -121,7 +118,6 @@ export const updateLeaveRequest = () => (dispatch, getState) => {
     .then((res) => {
       dispatch({ type: UPDATE_LEAVE_REQUEST })
       dispatch(fetchLeaveRequests(true))
-      dispatch(setLeaveModal(false))
       dispatch(
         returnAlerts(
           'Leave Request updated Successfully',
@@ -129,6 +125,7 @@ export const updateLeaveRequest = () => (dispatch, getState) => {
           'LEAVE_REQUEST_UPDATED',
         ),
       )
+      dispatch(setUpdateModal(false))
     })
     .catch((err) => {
       dispatch(returnErrors(err.response.data, err.response.status))

@@ -6,7 +6,7 @@ import Navbar from '../../../components/layout/Navbar';
 import { handleUnauthorized } from '../../../lib/utils';
 import { useGlobalContext } from '../../../context';
 
-function SalarySetting() {
+const SalarySetting = () => {
   const router = useRouter();
   const { id } = router.query;
   const dataFormatter = new Jsona();

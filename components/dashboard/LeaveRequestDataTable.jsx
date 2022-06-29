@@ -3,12 +3,12 @@ import DataTable from './DataTable'
 import { columns } from '../../data/leaveTableData'
 import { fetchLeaveRequests } from '../../redux/actions/leaveActions'
 
-function LeaveRequestDataTable({
+const LeaveRequestDataTable =({
   showModal,
   setShowModal,
   setLeaveRequest,
   fetchLeaveRequests,
-}) {
+}) => {
   const rowClick = (row) => {
     setLeaveRequest(row.original)
     setShowModal(!showModal)

@@ -1,56 +1,34 @@
-import { useState } from 'react'
-import { connect } from 'react-redux'
+import {useState} from 'react'
+import {connect} from 'react-redux'
 import Head from 'next/head'
 import FullCalendar from '@fullcalendar/react' // must go before plugins
 import dayGridPlugin from '@fullcalendar/daygrid'
 import interactionPlugin from '@fullcalendar/interaction' // needed for dayClick
 import axios from 'axios'
 import Jsona from 'jsona'
-import { useRouter } from 'next/router'
 import Modal from '../components/modal'
-import { Input, Label, Select, Option, Btn } from '../components/formComponents'
+import {Input, Label, Select, Option, Btn} from '../components/formComponents'
 import LeaveBalanceBadge from '../components/leaveBalanceBadge'
-import { handleUnauthorized } from '../lib/utils'
+import {isAdmin, colorMap, fullCalendarEndDate} from '../lib/utils'
 import Navbar from '../components/layout/Navbar'
+import {addLeaveRequest, setSelectedLeave, updateLeaveRequest} from "../redux/actions/leaveActions";
+import {setNewModal, setUpdateModal} from "../redux/actions/modalActions";
 
-
-function Calendar({ user }) {
-  const router = useRouter()
-
-  // const [leaveRequests, setLeaveRequests] = useState([]);
-  const [leaveRequest, setLeaveRequest] = useState({})
-  const [creatingLeaveRequest, setCreatingLeaveRequest] = useState(false)
-  const [updatingLeaveRequest, setUpdatingLeaveRequest] = useState(false)
+const Calendar = ({
+                    user,
+                    leave_request,
+                    newModal,
+                    updateModal,
+                    token,
+                    setSelectedLeave,
+                    addLeaveRequest,
+                    updateLeaveRequest,
+                    setNewModal,
+                    setUpdateModal
+                  }) => {
   const [error, setError] = useState('')
 
   const dataFormatter = new Jsona()
-
-  const isAdmin = () => user.role === 'admin'
-
-  const colorMap = (status) => {
-    switch (status) {
-      case 'pending':
-        return 'blue'
-      case 'rejected':
-        return 'red'
-      case 'approved':
-        return 'green'
-      default:
-        return 'blue'
-    }
-  }
-
-  const fullCalendarEndDate = (date) => {
-    let end_date = new Date(date)
-    end_date.setDate(end_date.getDate() + 1)
-    end_date.toLocaleString()
-    // we need to make sure we have date in YY-MM-DD format
-    // '2022-1-1' is not valid date
-    // '2022-01-01' is valid date
-    return `${end_date.getFullYear()}-${`0${end_date.getMonth() + 1}`.slice(
-      -2,
-    )}-${`0${end_date.getDate()}`.slice(-2)}`
-  }
 
   const createLeaveRequest = (info) => {
     setError('')
@@ -60,121 +38,43 @@ function Calendar({ user }) {
     endDate.setDate(endDate.getDate() - 1)
     endDate.toLocaleString()
 
-    setCreatingLeaveRequest(true)
-
-    setLeaveRequest({
-      ...leaveRequest,
-      leave_type: 'sick_leave',
-      start_date: info.startStr,
-      end_date: endDate,
-      status: 'pending',
-    })
-  }
-
-  const addEvent = async () => {
-    console.log('Adding leave request....')
-    // create leave request
-    try {
-      const response = await axios.post(
-        `${process.env.NEXT_PUBLIC_REMOTE_URL}/api/v1/leave_requests.json`,
-        {
-          leave_request: leaveRequest,
-        },
-        { headers: { Authorization: localStorage.token } },
-      )
-
-      if (response.statusText === 'OK') {
-        setCreatingLeaveRequest(false)
-        // add newly created leave request to the calendar
-        const leave_request = dataFormatter.deserialize(response.data)
-        leave_request.start = leave_request.start_date
-        leave_request.end = leave_request.end_date
-        setLeaveRequests([...leaveRequests, leave_request])
-      } else {
-        setError(response.data.message)
+    setSelectedLeave(
+      {
+        ...leave_request,
+        leave_type: 'sick_leave',
+        start_date: info.startStr,
+        end_date: endDate,
+        status: 'pending',
       }
-    } catch (error) {
-      setError(
-        (error.response &&
-          (error.response.data.message || error.response.data.error)) ||
-          error.message,
-      )
-      handleUnauthorized(error, router)
-    }
+    )
+    setNewModal(true)
   }
 
-  const updateEvent = async (status) => {
-    const leave_request = {
-      ...leaveRequest,
-      status: status,
-      approver_id: (isAdmin() || null) && user.id,
-    }
-
-    // update leave request
-    try {
-      const response = await axios.put(
-        `${process.env.NEXT_PUBLIC_REMOTE_URL}/api/v1/leave_requests/${leaveRequest.id}.json`,
-        {
-          leave_request: leave_request,
-        },
-        { headers: { Authorization: localStorage.token } },
-      )
-
-      if (response.statusText === 'OK') {
-        setUpdatingLeaveRequest(false)
-        // add updated leave request to the calendar
-        const leave_request = dataFormatter.deserialize(response.data)
-        leave_request.start = leave_request.start_date
-        leave_request.end = leave_request.end_date
-
-        // find index of the updated leave_request
-        const index = leaveRequests.findIndex(
-          (leave) => leave.id === leave_request.id,
-        )
-
-        // update leave_request at the index
-        const leave_requests = [...leaveRequests]
-        leave_requests[index] = leave_request
-
-        setLeaveRequests(leave_requests)
-      } else {
-        setError(response.data.message)
-      }
-    } catch (error) {
-      setError(
-        (error.response && JSON.stringify(error.response.data)) ||
-          error.message,
-      )
-      handleUnauthorized(error, router)
-    }
-  }
-
-  const updateLeaveRequest = async ({ event }) => {
+  const updateLeave = async ({event}) => {
     setError('')
 
     //  first get id of leave request with
-    const id = event.id
+    const {id} = event
 
     // make request to remote API to get leave request detail
     const response = await axios.get(
       `${process.env.NEXT_PUBLIC_REMOTE_URL}/api/v1/leave_requests/${id}`,
-      { headers: { Authorization: localStorage.token } },
+      {headers: {Authorization: token}},
     )
 
-    const leave_request = dataFormatter.deserialize(response.data)
-    setLeaveRequest(leave_request)
+    setSelectedLeave(dataFormatter.deserialize(response.data))
 
-    setUpdatingLeaveRequest(true)
+    setUpdateModal(true)
   }
 
   return (
     <>
       <Head>
         <title>Chitragupta App</title>
-        <meta name="description" content="chitragupta" />
-        <link rel="icon" href="/favicon.ico" />
+        <meta name="description" content="chitragupta"/>
+        <link rel="icon" href="/favicon.ico"/>
       </Head>
-      <Navbar />
+      <Navbar/>
       <div className="p-8">
         <FullCalendar
           plugins={[dayGridPlugin, interactionPlugin]}
@@ -185,8 +85,8 @@ function Calendar({ user }) {
             const response = await axios.get(
               `${process.env.NEXT_PUBLIC_REMOTE_URL}/api/v1/leave_requests.json`,
               {
-                params: { start, end, all_leaves: true },
-                headers: { Authorization: localStorage.token },
+                params: {start, end, all_leaves: true},
+                headers: {Authorization: token},
               },
             )
 
@@ -202,28 +102,28 @@ function Calendar({ user }) {
           selectable
           editable
           select={createLeaveRequest}
-          eventClick={updateLeaveRequest}
+          eventClick={updateLeave}
         />
       </div>
-      {creatingLeaveRequest && (
+      {newModal && (
         <Modal
-          setShowModal={setCreatingLeaveRequest}
-          showModal={creatingLeaveRequest}
+          setShowModal={setNewModal}
+          showModal={newModal}
           title='New Leave Request'
-          leaveRequest={leaveRequest}
+          leaveRequest={leave_request}
         >
           <div>
             <div className="flex justify-between">
               <LeaveBalanceBadge
-                label={'Sick Leave Balance'}
+                label='Sick Leave Balance'
                 balance={user.sick_leave_balance || 0}
               />
               <LeaveBalanceBadge
-                label={'Paid Leave Balance'}
+                label='Paid Leave Balance'
                 balance={user.paid_leave_balance || 0}
               />
               <LeaveBalanceBadge
-                label={'Unpaid Leave Balance'}
+                label='Unpaid Leave Balance'
                 balance={user.unpaid_leave_balance || 0}
               />
             </div>
@@ -231,25 +131,23 @@ function Calendar({ user }) {
             {error !== '' && <span className="mb-2 text-red-500">{error}</span>}
             <Label>Leave Type</Label>
             <Select
-              onChange={(e) =>
-                setLeaveRequest({ ...leaveRequest, leave_type: e.target.value })
-              }
+              onChange={(e) => setSelectedLeave({...leave_request, leave_type: e.target.value})}
             >
               <Option
                 value="sick_leave"
-                selected={leaveRequest.leave_type == 'sick_leave'}
+                selected={leave_request.leave_type === 'sick_leave'}
               >
                 Sick Leave
               </Option>
               <Option
                 value="personal"
-                selected={leaveRequest.leave_type == 'personal'}
+                selected={leave_request.leave_type === 'personal'}
               >
                 Personal
               </Option>
               <Option
                 value="others"
-                selected={leaveRequest.leave_type == 'others'}
+                selected={leave_request.leave_type === 'others'}
               >
                 Others
               </Option>
@@ -257,63 +155,59 @@ function Calendar({ user }) {
 
             <Label>Reason</Label>
             <Input
-              onChange={(e) =>
-                setLeaveRequest({ ...leaveRequest, title: e.target.value })
-              }
-              value={leaveRequest.title}
+              onChange={(e) => setSelectedLeave({...leave_request, title: e.target.value})}
+              value={leave_request.title}
             />
 
-            <Btn className="bg-blue-500 hover:bg-blue-600" onClick={addEvent}>
+            <Btn className="bg-blue-500 hover:bg-blue-600" onClick={addLeaveRequest}>
               Submit
             </Btn>
           </div>
         </Modal>
       )}
 
-      {updatingLeaveRequest && (
+      {updateModal && (
         <Modal
-          setShowModal={setUpdatingLeaveRequest}
-          showModal={updatingLeaveRequest}
-          title={`${leaveRequest.user.first_name} ${leaveRequest.user.last_name}`}
+          setShowModal={setUpdateModal}
+          showModal={updateModal}
+          title={`${leave_request.user.first_name} ${leave_request.user.last_name}`}
         >
           <div className="flex justify-between">
             <LeaveBalanceBadge
-              label={'Sick Leave Balance'}
-              balance={leaveRequest.user.sick_leave_balance}
+              label='Sick Leave Balance'
+              balance={leave_request.user.sick_leave_balance}
             />
             <LeaveBalanceBadge
-              label={'Paid Leave Balance'}
-              balance={leaveRequest.user.paid_leave_balance}
+              label='Paid Leave Balance'
+              balance={leave_request.user.paid_leave_balance}
             />
             <LeaveBalanceBadge
-              label={'Unpaid Leave Balance'}
-              balance={leaveRequest.user.unpaid_leave_balance}
+              label='Unpaid Leave Balance'
+              balance={leave_request.user.unpaid_leave_balance}
             />
           </div>
           <div>
             {error !== '' && <span className="mb-2 text-red-500">{error}</span>}
             <Label>Leave Type</Label>
             <Select
-              onChange={(e) =>
-                setLeaveRequest({ ...leaveRequest, leave_type: e.target.value })
-              }
-              disabled={isAdmin()}
+              onChange={(e) => setSelectedLeave({...leave_request, leave_type: e.target.value})}
+              disabled={isAdmin(user)}
             >
               <Option
                 value="sick_leave"
-                selected={leaveRequest.leave_type == 'sick_leave'}
+                selected={leave_request.leave_type === 'sick_leave'}
               >
                 Sick Leave
               </Option>
               <Option
                 value="personal"
-                selected={leaveRequest.leave_type == 'personal'}
+                selected={leave_request.leave_type === 'personal'}
               >
                 Personal
               </Option>
               <Option
                 value="others"
-                selected={leaveRequest.leave_type == 'others'}
+                selected={leave_request.leave_type === 'others'}
               >
                 Others
               </Option>
@@ -322,43 +216,49 @@ function Calendar({ user }) {
             <Label>Reason</Label>
             <Input
               onChange={(e) =>
-                setLeaveRequest({ ...leaveRequest, title: e.target.value })
+                setSelectedLeave({...leave_request, title: e.target.value})
               }
-              value={leaveRequest.title}
-              disabled={isAdmin()}
+              value={leave_request.title}
+              disabled={isAdmin(user)}
             />
 
-            {isAdmin() && (
+            {isAdmin(user) && (
               <>
                 <Label>Reply</Label>
                 <Input
                   onChange={(e) =>
-                    setLeaveRequest({
-                      ...leaveRequest,
-                      reply_attributes: { reason: e.target.value },
+                    setSelectedLeave({
+                      ...leave_request,
+                      reply_attributes: {reason: e.target.value},
                     })
                   }
-                  value={leaveRequest.reply && leaveRequest.reply.reason}
+                  value={leave_request.reply && leave_request.reply.reason}
                 />
                 <Btn
                   className="bg-red-500 hover:bg-red-600"
-                  onClick={() => updateEvent('rejected')}
+                  onClick={() => {
+                    setSelectedLeave({...leave_request, status: 'rejected'})
+                    updateLeaveRequest()
+                  }}
                 >
                   Reject
                 </Btn>
                 <Btn
                   className="ml-2 bg-green-500 hover:bg-green-600"
-                  onClick={() => updateEvent('approved')}
+                  onClick={() => {
+                    setSelectedLeave({...leave_request, status: 'approved'})
+                    updateLeaveRequest()
+                  }}
                 >
                   Approve
                 </Btn>
               </>
             )}
 
-            {!isAdmin() && (
+            {!isAdmin(user) && (
               <Btn
                 className="bg-blue-500 hover:bg-blue-600"
-                onClick={() => updateEvent(leaveRequest.status)}
+                onClick={() => updateLeaveRequest()}
               >
                 Update
               </Btn>
@@ -371,6 +271,16 @@ function Calendar({ user }) {
 }
 
 const mapStateToProps = (state) => ({
-  user: state.auth.user
+  user: state.auth.user,
+  leave_request: state.leave.selectedLeave,
+  newModal: state.modal.newModal,
+  updateModal: state.modal.updateModal,
+  token: state.auth.token
 })
-export default connect(mapStateToProps)(Calendar)
+export default connect(mapStateToProps, {
+  setSelectedLeave,
+  addLeaveRequest,
+  updateLeaveRequest,
+  setNewModal,
+  setUpdateModal
+})(Calendar)

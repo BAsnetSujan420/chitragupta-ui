@@ -4,7 +4,7 @@ import { connect } from 'react-redux'
 import { setPage } from '../../redux/actions/dashboardActions'
 import Loader from '../ui/loader'
 
-function DataTable({
+const DataTable = ({
   children,
   data,
   rowClick,
@@ -15,7 +15,7 @@ function DataTable({
   fetchFunction,
   token,
   loading,
-}) {
+}) => {
   const {
     getTableProps,
     getTableBodyProps,

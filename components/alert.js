@@ -2,7 +2,7 @@ import { useEffect } from 'react';
 import { connect } from 'react-redux';
 import { clearErrors } from '../redux/actions/alertActions';
 
-function Alert(props) {
+const Alert = (props) => {
   const { message, type } = props.alerts;
   const show = message !== null;
   const success = type === 'success';

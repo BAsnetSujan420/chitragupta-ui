@@ -41,6 +41,11 @@ export const SET_BATCH = 'SET_BATCH'
 
 export const SHOW_MODAL = 'SHOW_MODAL'
 export const GET_USER = 'GET_USER'
+export const SET_REDIRECT = 'SET_REDIRECT'
+export const RESET_REDIRECT = 'RESET_REDIRECT'
+
+export const SET_NEW_MODAL = 'SET_NEW_MODAL'
+export const SET_UDPATE_MODAL = 'SET_UPDATE_MODAL'
 
 // types for server
 export const SET_IS_SERVER = 'SET_IS_SERVER'

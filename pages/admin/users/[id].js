@@ -14,7 +14,7 @@ import Modal from '../../../components/modal'
 import { fetchUser } from '../../../redux/actions/usersActions'
 import { fetchAllSalaries } from '../../../redux/actions/dashboardActions'
 
-function User({ fetchUser, fetchAllSalaries, currentUser, user, salaries }) {
+const User = ({ fetchUser, fetchAllSalaries, currentUser, user, salaries }) => {
   const isAdmin = () => currentUser && currentUser.role === 'admin'
   const [updatingUser, setUpdatingUser] = useState(false)
   const [salary, setSalary] = useState(null)
@@ -40,7 +40,7 @@ function User({ fetchUser, fetchAllSalaries, currentUser, user, salaries }) {
     user ? Math.round((leave_balance / total) * 100) : 0
 
   useEffect(() => {
-    let salary_controller = new AbortController()
+    const salary_controller = new AbortController()
 
     currentUser && fetchUser(user_id)
     isAdmin() && fetchAllSalaries()

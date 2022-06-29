@@ -5,7 +5,9 @@ import {
     LOGIN_SUCCESS,
     LOGIN_FAIL,
     LOGOUT_SUCCESS,
-    SET_TOKEN
+    SET_TOKEN,
+    SET_REDIRECT,
+    RESET_REDIRECT,
 } from '../actions/types'
 
 const initialState = {
@@ -13,7 +15,8 @@ const initialState = {
     isAuthenticated: null,
     isLoading: false,
     user: null,
-    verify_token: false
+    verify_token: false,
+    redirect: null
 }
 
 export default function (state = initialState, action) {
@@ -55,6 +58,16 @@ export default function (state = initialState, action) {
                 user: null,
                 isLoading: false,
                 verify_token: false
+            }
+        case SET_REDIRECT:
+            return {
+                ...state,
+                redirect: action.payload
+            }
+        case RESET_REDIRECT:
+            return {
+                ...state,
+                redirect: null
             }
 
         default:

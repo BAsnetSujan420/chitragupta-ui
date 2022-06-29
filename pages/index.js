@@ -4,7 +4,6 @@ import Navbar from '../components/layout/Navbar'
 import Modal from '../components/modal'
 import { Btn, Input, Label } from '../components/formComponents'
 import LeaveBalanceBadge from '../components/leaveBalanceBadge'
-import Loader from '../components/ui/loader'
 import {
   fetchLeaveRequests,
   setSelectedLeave,
@@ -13,10 +12,10 @@ import {
 } from '../redux/actions/leaveActions'
 import { setFetchAllRecords } from '../redux/actions/dashboardActions'
 
-function Home(props) {
+const Home = (props) => {
   const isAdmin = () => props.user && props.user.role === 'admin'
 
-  return true ? (
+  return (
     <>
       <Navbar page="Dashboard" subPages={['Calendar', 'Admin']} />
       <div className="p-12 mx-6 -mt-6 bg-white rounded shadow h-3/5">
@@ -150,8 +149,6 @@ function Home(props) {
         )}
       </div>
     </>
-  ) : (
-    <Loader />
   )
 }
 

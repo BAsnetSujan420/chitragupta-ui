@@ -1,7 +1,5 @@
 import {  useState } from 'react'
 import { connect } from 'react-redux'
-import axios from 'axios'
-import Jsona from 'jsona'
 import DataTable from './DataTable'
 import { columns } from '../../data/salarySettingsTableData'
 import { TableContainer } from '../modalComponents'
@@ -9,19 +7,19 @@ import { Btn } from '../formComponents'
 import Modal from '../modal'
 import SalarySettingForm from '../salarySettingForm'
 import { fetchSalarySettings } from '../../redux/actions/dashboardActions'
+import {createNewSalarySetting, remoteUpdateSalarySetting} from '../../redux/actions/salarySettingActions'
 
-function SalariesDataTable({
-  salarySettings,
-  setSalarySettings,
+const SalariesDataTable = ({
   fetchSalarySettings,
-}) {
+  createNewSalarySetting,
+  remoteUpdateSalarySetting
+}) => {
   const [salarySetting, setSalarySetting] = useState({})
   const [createNew, setCreateNew] = useState(false)
   const [errors, setErrors] = useState({})
   const [taxRules, setTaxRules] = useState([])
   const [updatingSalarySetting, setUpdatingSalarySetting] = useState(false)
 
-  const dataFormatter = new Jsona()
   const creatingNew = () => setCreateNew(true)
   const numberRegEx = /^\d+.?\d*$/
 
@@ -78,59 +76,17 @@ function SalariesDataTable({
     return errorCount
   }
 
-  const createSalarySetting = async () => {
+  const createSalarySetting = () => {
     if (checkIfFormIsValid() === 0) {
-      try {
-        const response = await axios.post(
-          `${process.env.NEXT_PUBLIC_REMOTE_URL}/api/v1/salary_settings.json`,
-          {
-            salary_setting: {
-              ...salarySetting,
-              tax_rules_attributes: taxRules,
-            },
-          },
-          {
-            headers: {
-              Authorization: localStorage.token,
-            },
-          },
-        )
-
-        if (response.statusText === 'OK') {
-          setSalarySettings([
-            dataFormatter.deserialize(response.data),
-            ...salarySettings,
-          ])
-          setCreateNew(false)
-          setSalarySetting({})
-          setTaxRules([])
-        }
-      } catch (error) {
-        // console.log(error);
-      }
+      createNewSalarySetting(salarySetting, taxRules)
+      setCreateNew(false)
     }
   }
 
-  const remoteUpdateSalarySetting = async () => {
+  const sendUpdateSalarySettingRequest = () => {
     if (checkIfFormIsValid() === 0) {
-      try {
-        await axios.put(
-          `${process.env.NEXT_PUBLIC_REMOTE_URL}/api/v1/salary_settings/${salarySetting.id}.json`,
-          {
-            salary_setting: {
-              ...salarySetting,
-              tax_rules_attributes: taxRules,
-            },
-          },
-          {
-            headers: {
-              Authorization: localStorage.token,
-            },
-          },
-        )
-      } catch (error) {
-        // console.log(error);
-      }
+      remoteUpdateSalarySetting(salarySetting, taxRules)
+      setUpdatingSalarySetting(false)
     }
   }
 
@@ -158,7 +114,7 @@ function SalariesDataTable({
       setErrors({ ...errors, [e.target.name]: null })
     }
     const index = taxRules.findIndex(
-      (taxRule) => taxRule.id == e.target.id || taxRule.key == e.target.id,
+      (taxRule) => taxRule.id === e.target.id || taxRule.key === e.target.id,
     )
     const name_with_key = e.target.name
     const name_without_key = name_with_key.split('_').slice(0, -1).join('_')
@@ -226,7 +182,7 @@ function SalariesDataTable({
             salarySetting={salarySetting}
             errors={errors}
             taxRules={taxRules}
-            onSubmit={remoteUpdateSalarySetting}
+            onSubmit={sendUpdateSalarySettingRequest}
             setTaxRules={setTaxRules}
             updateTaxRules={updateTaxRules}
             removeTaxRule={removeTaxRule}
@@ -237,4 +193,4 @@ function SalariesDataTable({
   )
 }
 
-export default connect(() => ({}), { fetchSalarySettings })(SalariesDataTable)
+export default connect(() => ({}), { fetchSalarySettings, createNewSalarySetting, remoteUpdateSalarySetting })(SalariesDataTable)

@@ -8,7 +8,7 @@ import DataTable from './DataTable'
 import Alert from '../alert'
 import { fetchUsers } from '../../redux/actions/usersActions'
 
-function UsersDataTable({ fetchUsers }) {
+const UsersDataTable = ({ fetchUsers }) => {
   // const { users } = useGlobalContext()
   const router = useRouter()
   const [error, setError] = useState('')
