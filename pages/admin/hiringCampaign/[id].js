@@ -9,20 +9,16 @@ import { Btn } from '../../../components/formComponents'
 import Modal from '../../../components/modal'
 import JobApplicantForm from '../../../components/jobApplicantForm'
 
-
-
-function HiringCampaign() {
+const HiringCampaign = () => {
   const router = useRouter()
-  const id  = router.query.id
+  const { id } = router.query
   const dataFormatter = new Jsona()
-
   const [hiringCampaign, setHiringCampaign] = useState({})
   const setToken = useGlobalContext()
-  const creatingNew = () => setCreateNew(true)
   const [createNew, setCreateNew] = useState(false)
+  const creatingNew = () => setCreateNew(true)
   const [errors, setErrors] = useState({})
   const [jobApplicant, setJobApplicant] = useState({})
-  const [updatingJobApplicant, setUpdatingJobApplicant] = useState(false)
 
   useEffect(() => {
     const fetchHiringCampaign = async () => {
@@ -61,11 +57,11 @@ function HiringCampaign() {
 
   // create new hiring campaign
   const createJobApplicant = async () => {
-       const formData = new FormData()
+    const formData = new FormData()
 
-    for (const field in jobApplicant) {
-      formData.append(`job_applicant[${field}]`, jobApplicant[field])
-    }
+    Object.keys(jobApplicant).forEach(field => {
+       formData.append(`job_applicant[${field}]`, jobApplicant[field])
+    });
 
       formData.append('cv', document.querySelector("#file-upload").files[0])
     if (checkIfFormIsValid() === 0) {
@@ -126,7 +122,7 @@ const updateJobApplicant = (e) => {
             'status',
             'creator_id',
           ].map((field) => (
-            <li className="flex flex-row uppercase h-20">
+            <li className="flex flex-row uppercase h-20" >
               <div className="my-auto ml-4 align-middle">
                 {field.split('_').join(' ')}: {hiringCampaign[field]}
               </div>
@@ -134,12 +130,11 @@ const updateJobApplicant = (e) => {
           ))}
         </ul>
       </div>
-       <div className="flex justify-end py-4">
+      <div className="flex justify-end py-4">
             <Btn className="bg-teal-500 hover:bg-teal-600" onClick={creatingNew}>
                 Apply Now
             </Btn>
       </div>
-
 
       {createNew && (
         <Modal
@@ -155,7 +150,6 @@ const updateJobApplicant = (e) => {
           />
         </Modal>
       )}
-
     </>
   )
 }

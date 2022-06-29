@@ -1,8 +1,7 @@
-import { Label, Input } from './formComponents';
+import { Label } from './formComponents';
 import { Dropdown } from './dropdownComponents';
 
-function DropdownMenuWithLabelAndError({ name, errors, value, onChange }) {
-  return (
+const DropdownMenuWithLabelAndError = ({ name, errors, value, onChange })  => (
     <div className="w-full pr-4 mb-4 md:w-1/2">
       <Label
         className={`${
@@ -22,6 +21,5 @@ function DropdownMenuWithLabelAndError({ name, errors, value, onChange }) {
       )}
     </div>
   );
-}
 
 export default DropdownMenuWithLabelAndError;

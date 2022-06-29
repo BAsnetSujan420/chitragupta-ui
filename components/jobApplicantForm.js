@@ -1,10 +1,8 @@
 import InputWithLabelAndError from './InputWithLabelAndError'
-import { Btn, Label, Input, Select, Option } from './formComponents'
-import React from 'react';
+import { Btn, Label, Input } from './formComponents'
 
-function JobApplicantForm({ updateJobApplicant, jobApplicant, errors, onSubmit }) {
-
-  return (
+const JobApplicantForm = ({ updateJobApplicant, jobApplicant, errors, onSubmit }) =>
+   (
     <>
       <div className="flex flex-wrap">
         {[
@@ -14,12 +12,11 @@ function JobApplicantForm({ updateJobApplicant, jobApplicant, errors, onSubmit }
           'referrer_id',
           'primary_phone_number',
           'secondary_phone_number'
-        ].map((field, index) => (
+        ].map((field) => (
           <InputWithLabelAndError
             name={field}
             value={jobApplicant[field]}
             errors={errors}
-            key={index}
             onChange={updateJobApplicant}
           />
         ))}
@@ -49,6 +46,5 @@ function JobApplicantForm({ updateJobApplicant, jobApplicant, errors, onSubmit }
       </Btn>
     </>
   )
-}
 
 export default JobApplicantForm

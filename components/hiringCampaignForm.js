@@ -1,8 +1,8 @@
 import InputWithLabelAndError from './InputWithLabelAndError'
 import { Btn, Label, Input, Select, Option} from './formComponents'
 
-function HiringCampaignForm({ hiringCampaign, errors, onSubmit, updateHiringCampaign }) {
-  return (
+const HiringCampaignForm = ({ hiringCampaign, errors, onSubmit, updateHiringCampaign }) =>
+   (
     <>
         <div className="flex flex-wrap">
           <div className="w-full pr-4 mb-4 md:w-1/2">
@@ -51,12 +51,11 @@ function HiringCampaignForm({ hiringCampaign, errors, onSubmit, updateHiringCamp
           'job_title',
           'job_description',
           'remarks',
-        ].map((field, index) => (
+        ].map((field) => (
           <InputWithLabelAndError
             name={field}
             value={hiringCampaign[field]}
             errors={errors}
-            key={index}
             onChange={updateHiringCampaign}
           />
         ))}
@@ -72,19 +71,19 @@ function HiringCampaignForm({ hiringCampaign, errors, onSubmit, updateHiringCamp
               </Option>
               <Option
                 value="draft"
-                selected={hiringCampaign.status == 'draft'}
+                selected={hiringCampaign.status === 'draft'}
               >
                 draft
               </Option>
               <Option
                 value="publised"
-                selected={hiringCampaign.status == 'publised'}
+                selected={hiringCampaign.status === 'publised'}
               >
                 published
               </Option>
               <Option
                 value="achived"
-                selected={hiringCampaign.status == 'achived'}
+                selected={hiringCampaign.status === 'achived'}
               >
                 achived
               </Option>
@@ -96,6 +95,5 @@ function HiringCampaignForm({ hiringCampaign, errors, onSubmit, updateHiringCamp
       </Btn>
     </>
   )
-}
 
 export default HiringCampaignForm

@@ -1,14 +1,14 @@
 import { useEffect, useState } from 'react'
-import { connect} from 'react-redux'
+import { connect } from 'react-redux'
+import axios from 'axios'
 import DataTable from './DataTable'
 import { columns } from '../../data/jobApplicantTableData'
 import { fetchJobApplicants } from '../../redux/actions/dashboardActions'
 import { TableContainer } from '../modalComponents'
 import Modal from '../modal'
 import JobApplicantForm from '../jobApplicantForm'
-import axios from 'axios'
 
-function JobApplicant({ fetchJobApplicants }) {
+const JobApplicant = ({ fetchJobApplicants }) => {
   const [jobApplicant, setJobApplicant] = useState({})
   const [errors, setErrors] = useState({})
   const [updatingJobApplicant, setUpdatingJobApplicant] = useState(false)
@@ -37,13 +37,14 @@ function JobApplicant({ fetchJobApplicants }) {
 
     // updating hiring campaign
   const remoteUpdateJobApplicant = async () => {
-         const formData = new FormData()
+    const formData = new FormData()
 
-    for (const field in jobApplicant) {
-      formData.append(`job_applicant[${field}]`, jobApplicant[field])
-    }
+    Object.keys(jobApplicant).forEach(field => {
+       formData.append(`job_applicant[${field}]`, jobApplicant[field])
+    });
 
-      formData.append('cv', document.querySelector("#file-upload").files[0])
+    formData.append('cv', document.querySelector("#file-upload").files[0])
+
     if (checkIfFormIsValid() === 0) {
       try {
         await axios.put(
@@ -110,10 +111,11 @@ function JobApplicant({ fetchJobApplicants }) {
     </>
   )
 }
-const mapDispatchToProps = (dispatch) => {
-  return {
+
+const mapDispatchToProps = (dispatch) => (
+  {
     fetchJobApplicants: () => dispatch(fetchJobApplicants()),
   }
-}
+)
 
 export default connect(null,mapDispatchToProps)(JobApplicant)

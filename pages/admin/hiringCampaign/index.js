@@ -1,13 +1,11 @@
 import HiringCampaignTableData from '../../../components/dashboard/HiringCampaignDataTable'
 import Navbar from '../../../components/layout/Navbar'
 
-const HiringCampaign = () => {
-  return (
+const HiringCampaign = () => (
     <>
       <Navbar />
       <HiringCampaignTableData />
     </>
   )
-}
 
 export default HiringCampaign

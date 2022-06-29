@@ -10,8 +10,7 @@ import Modal from '../modal'
 import { fetchHiringCampaigns } from '../../redux/actions/dashboardActions'
 import HiringCampaignForm from '../hiringCampaignForm'
 
-
-function HiringCampaign({ hiringCampaigns, fetchHiringCampaign}) {
+const HiringCampaign = ({ fetchHiringCampaign }) => {
   const [hiringCampaign, setHiringCampaign] = useState({})
   const [createNew, setCreateNew] = useState(false)
   const [errors, setErrors] = useState({})
@@ -55,8 +54,6 @@ function HiringCampaign({ hiringCampaigns, fetchHiringCampaign}) {
     return errorCount
  }
 
-
-
   // create new hiring campaign
   const createHiringCampaign = async () => {
     if (checkIfFormIsValid() === 0) {
@@ -88,7 +85,6 @@ function HiringCampaign({ hiringCampaigns, fetchHiringCampaign}) {
         console.log(error);
       }
     }
-
   }
 
   // updating hiring campaign
@@ -166,7 +162,6 @@ function HiringCampaign({ hiringCampaigns, fetchHiringCampaign}) {
         </Modal>
       )}
 
-
       {updatingHiringCampaign && (
         <Modal
           showModal={updatingHiringCampaign}
@@ -185,15 +180,15 @@ function HiringCampaign({ hiringCampaigns, fetchHiringCampaign}) {
   )
 }
 
-const mapStateToProps = (state) => {
-  return {
+const mapStateToProps = (state) => (
+   {
     hiringCampaigns: state.records,
   }
-}
-const mapDispatchToProps = (dispatch) => {
-  return {
+)
+const mapDispatchToProps = (dispatch) => (
+  {
     fetchHiringCampaign: () => dispatch(fetchHiringCampaigns()),
   }
-}
+)
 
 export default connect(mapStateToProps, mapDispatchToProps)(HiringCampaign)
