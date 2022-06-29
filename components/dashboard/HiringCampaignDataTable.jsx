@@ -113,7 +113,7 @@ const HiringCampaign = ({ fetchHiringCampaign }) => {
 
   const updateHiringCampaign = (e) => {
     delete errors[e.target.name]
-    if  (
+    if(
       !([
           'start_date',
           'end_date',

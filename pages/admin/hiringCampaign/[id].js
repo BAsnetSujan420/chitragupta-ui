@@ -93,7 +93,7 @@ const HiringCampaign = () => {
 
 const updateJobApplicant = (e) => {
     delete errors[e.target.name]
-    if  (
+    if(
       !([
           'first_name',
           'last_name',

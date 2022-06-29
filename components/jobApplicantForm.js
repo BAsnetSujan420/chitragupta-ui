@@ -31,10 +31,9 @@ const JobApplicantForm = ({ updateJobApplicant, jobApplicant, errors, onSubmit }
             </Label>
           <Input
             id="file-upload"
-              name="cv"
+            name="cv"
             type="file"
-
-              className={errors.cv ? 'border-red-500' : ''}
+            className={errors.cv ? 'border-red-500' : ''}
             />
             {errors.cv && (
               <span className="text-sm text-red-500">{errors.cv}</span>
