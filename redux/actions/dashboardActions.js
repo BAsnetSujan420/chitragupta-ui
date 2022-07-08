@@ -7,7 +7,7 @@ import {
   SET_BATCH,
   LEAVE_REQUESTS_LOADING,
   GET_RECORDS,
-  SHOW_MODAL
+  SHOW_MODAL,
 } from './types'
 
 export const setShowModal = (modal) => (dispatch) => {
@@ -119,6 +119,75 @@ export const fetchOvertimes = () => (dispatch, getState) => {
   axios
     .get(
       `${process.env.NEXT_PUBLIC_REMOTE_URL}/api/v1/overtimes.json`,
+      tokenConfig(getState),
+    )
+    .then((res) => {
+      dispatch({
+        type: GET_RECORDS,
+        payload: res.data,
+      })
+    })
+    .catch((err) => {
+      dispatch(
+        returnErrors(
+          err.response && err.response.data,
+          err.response && err.response.status,
+        ),
+      )
+    })
+}
+
+export const fetchHiringCampaigns = () => (dispatch, getState) => {
+  dispatch(setLoadingState(true))
+  axios
+    .get(
+      `${process.env.NEXT_PUBLIC_REMOTE_URL}/api/v1/hiring_campaign`,
+      tokenConfig(getState),
+    )
+    .then((res) => {
+      dispatch({
+        type: GET_RECORDS,
+        payload: res.data,
+      })
+    })
+    .catch((err) => {
+      dispatch(
+        returnErrors(
+          err.response && err.response.data,
+          err.response && err.response.status,
+        ),
+      )
+    })
+}
+
+export const fetchHiring = (id) => async (dispatch, getState) => {
+    dispatch(setLoadingState(true))
+  axios
+    .get(
+      `${process.env.NEXT_PUBLIC_REMOTE_URL}/api/v1/hiring_campaign/${id}`,
+      tokenConfig(getState),
+    )
+    .then((res) => {
+      dispatch({
+        type: GET_RECORDS,
+        payload: res.data,
+      })
+    })
+    .catch((err) => {
+      dispatch(
+        returnErrors(
+          err.response && err.response.data,
+          err.response && err.response.status,
+        ),
+      )
+    })
+}
+
+export const fetchJobApplicants = () => (dispatch, getState) => {
+  dispatch(setLoadingState(true))
+  axios
+    .get(
+      `${process.env.NEXT_PUBLIC_REMOTE_URL}/api/v1/job_applicant`,
       tokenConfig(getState),
     )
     .then((res) => {

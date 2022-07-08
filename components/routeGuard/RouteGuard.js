@@ -36,7 +36,7 @@ const RouteGuard = (props) => {
       router.push(redirect)
       props.resetRedirect()
     }
-    const publicPaths = ['/login', '/users/invitation_accept']
+    const publicPaths = ['/login', '/users/invitation_accept', '/admin/hiringCampaign/[id]']
     if (!token && !publicPaths.includes(router.pathname)) {
       router.push({
         pathname: '/login',
