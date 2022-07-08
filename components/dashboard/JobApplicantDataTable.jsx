@@ -1,14 +1,14 @@
 import { useEffect, useState } from 'react'
 import { connect } from 'react-redux'
-import axios from 'axios'
 import DataTable from './DataTable'
 import { columns } from '../../data/jobApplicantTableData'
 import { fetchJobApplicants } from '../../redux/actions/dashboardActions'
 import { TableContainer } from '../modalComponents'
 import Modal from '../modal'
 import JobApplicantForm from '../jobApplicantForm'
+import { remoteUpdateJobApplicant } from '../../redux/actions/jobApplicantAction'
 
-const JobApplicant = ({ fetchJobApplicants }) => {
+const JobApplicant = ({ fetchJobApplicants, remoteUpdateJobApplicant }) => {
   const [jobApplicant, setJobApplicant] = useState({})
   const [errors, setErrors] = useState({})
   const [updatingJobApplicant, setUpdatingJobApplicant] = useState(false)
@@ -22,7 +22,6 @@ const JobApplicant = ({ fetchJobApplicants }) => {
             'first_name',
             'last_name',
             'email',
-            'referrer_id',
             'primary_phone_number',
             'secondary_phone_number',
         ].forEach((field) => {
@@ -35,43 +34,21 @@ const JobApplicant = ({ fetchJobApplicants }) => {
          return errorCount
     }
 
-    // updating hiring campaign
-  const remoteUpdateJobApplicant = async () => {
-    const formData = new FormData()
-
-    Object.keys(jobApplicant).forEach(field => {
-       formData.append(`job_applicant[${field}]`, jobApplicant[field])
-    });
-
-    formData.append('cv', document.querySelector("#file-upload").files[0])
-
+  // updating hiring campaign
+  const sendUpdateJobApplicant = async () => {
     if (checkIfFormIsValid() === 0) {
-      try {
-        await axios.put(
-          `${process.env.NEXT_PUBLIC_REMOTE_URL}/api/v1/job_applicant/${jobApplicant.id}.json`,
-            formData,
-          {
-            headers: {
-              Authorization: localStorage.token,
-              'Content-Type': 'multipart/form-data',
-            },
-          },
-        )
-        window.location.reload()
-      } catch (error) {
-        console.log(error);
-      }
+      remoteUpdateJobApplicant(jobApplicant)
+      setUpdatingJobApplicant(false)
     }
   }
 
   const updateJobApplicant = (e) => {
     delete errors[e.target.name]
-    if  (
+    if(
       !([
           'first_name',
           'last_name',
           'email',
-          'referrer_id',
           'primary_phone_number',
           'secondary_phone_number',
       ].includes(e.target.name))
@@ -81,12 +58,16 @@ const JobApplicant = ({ fetchJobApplicants }) => {
       setJobApplicant({ ...jobApplicant, [e.target.name]: e.target.value })
   }
 
+  const updateReferrer = (e) => {
+    delete errors[e.target.name]
+    setJobApplicant({ ...jobApplicant, [e.target.name]: e.target.value })
+  }
+
   return (
     <>
       <TableContainer>
         <DataTable
           rowClick={(row) => {
-            console.log(row.original)
             setJobApplicant(row.original)
             setUpdatingJobApplicant(true)
           }}
@@ -104,7 +85,9 @@ const JobApplicant = ({ fetchJobApplicants }) => {
             updateJobApplicant={updateJobApplicant}
             errors={errors}
             jobApplicant={jobApplicant}
-            onSubmit={remoteUpdateJobApplicant}
+            onSubmit={sendUpdateJobApplicant}
+            title="update"
+            updateReferrer={updateReferrer}
           />
         </Modal>
       )}
@@ -112,10 +95,4 @@ const JobApplicant = ({ fetchJobApplicants }) => {
   )
 }
 
-const mapDispatchToProps = (dispatch) => (
-  {
-    fetchJobApplicants: () => dispatch(fetchJobApplicants()),
-  }
-)
-
-export default connect(null,mapDispatchToProps)(JobApplicant)
+export default connect(() => ({}), { fetchJobApplicants, remoteUpdateJobApplicant })(JobApplicant)

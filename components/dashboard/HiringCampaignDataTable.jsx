@@ -1,7 +1,5 @@
 import { useEffect, useState } from 'react'
 import { connect} from 'react-redux'
-import axios from 'axios'
-import Jsona from 'jsona'
 import DataTable from './DataTable'
 import { columns } from '../../data/hiringCampaignTableData'
 import { TableContainer } from '../modalComponents'
@@ -9,17 +7,17 @@ import { Btn } from '../formComponents'
 import Modal from '../modal'
 import { fetchHiringCampaigns } from '../../redux/actions/dashboardActions'
 import HiringCampaignForm from '../hiringCampaignForm'
+import { createNewHiringCampaign, remoteUpdateHiringCampaign } from '../../redux/actions/hiringCampaignAction'
 
-const HiringCampaign = ({ fetchHiringCampaign }) => {
+const HiringCampaign = ({ fetchHiringCampaigns, createNewHiringCampaign, remoteUpdateHiringCampaign }) => {
   const [hiringCampaign, setHiringCampaign] = useState({})
   const [createNew, setCreateNew] = useState(false)
   const [errors, setErrors] = useState({})
   const [updatingHiringCampaign, setUpdatingHiringCampaign] = useState(false)
-  const dataFormatter = new Jsona()
   const creatingNew = () => setCreateNew(true)
 
   useEffect(() => {
-    fetchHiringCampaign()
+    fetchHiringCampaigns()
   }, [])
 
  const checkIfFormIsValid = () => {
@@ -57,57 +55,16 @@ const HiringCampaign = ({ fetchHiringCampaign }) => {
   // create new hiring campaign
   const createHiringCampaign = async () => {
     if (checkIfFormIsValid() === 0) {
-      try {
-        const response = await axios.post(
-          `${process.env.NEXT_PUBLIC_REMOTE_URL}/api/v1/hiring_campaign`,
-          {
-            hiring_campaign: {
-              ...hiringCampaign,
-            },
-          },
-          {
-            headers: {
-              Authorization: localStorage.token,
-            },
-          },
-        )
-         window.location.reload()
-        if (response.statusText === 'OK') {
-          setHiringCampaign([
-            dataFormatter.deserialize(response.data),
-            ...hiringCampaign,
-          ])
-          setCreateNew(false)
-          setHiringCampaign({})
-
-        }
-      } catch (error) {
-        console.log(error);
-      }
+      createNewHiringCampaign(hiringCampaign)
+      setCreateNew(false)
     }
   }
 
   // updating hiring campaign
-  const remoteUpdateHiringCampaign = async () => {
+  const sendUpdateHiringCampaign = async () => {
     if (checkIfFormIsValid() === 0) {
-      try {
-        await axios.put(
-          `${process.env.NEXT_PUBLIC_REMOTE_URL}/api/v1/hiring_campaign/${hiringCampaign.id}.json`,
-          {
-            hiring_campaign: {
-              ...hiringCampaign,
-            },
-          },
-          {
-            headers: {
-              Authorization: localStorage.token,
-            },
-          },
-        )
-        window.location.reload()
-      } catch (error) {
-        console.log(error);
-      }
+      remoteUpdateHiringCampaign(hiringCampaign)
+      setUpdatingHiringCampaign(false)
     }
   }
 
@@ -143,7 +100,7 @@ const HiringCampaign = ({ fetchHiringCampaign }) => {
             setUpdatingHiringCampaign(true)
           }}
           columns={columns}
-          fetchFunction={fetchHiringCampaign} />
+          fetchFunction={fetchHiringCampaigns} />
       </TableContainer>
 
       {createNew && (
@@ -172,7 +129,7 @@ const HiringCampaign = ({ fetchHiringCampaign }) => {
             updateHiringCampaign={updateHiringCampaign}
             errors={errors}
             hiringCampaign={hiringCampaign}
-            onSubmit={remoteUpdateHiringCampaign}
+            onSubmit={sendUpdateHiringCampaign}
           />
         </Modal>
       )}
@@ -180,15 +137,4 @@ const HiringCampaign = ({ fetchHiringCampaign }) => {
   )
 }
 
-const mapStateToProps = (state) => (
-   {
-    hiringCampaigns: state.records,
-  }
-)
-const mapDispatchToProps = (dispatch) => (
-  {
-    fetchHiringCampaign: () => dispatch(fetchHiringCampaigns()),
-  }
-)
-
-export default connect(mapStateToProps, mapDispatchToProps)(HiringCampaign)
+export default connect(() => ({}), { fetchHiringCampaigns, createNewHiringCampaign, remoteUpdateHiringCampaign })(HiringCampaign)

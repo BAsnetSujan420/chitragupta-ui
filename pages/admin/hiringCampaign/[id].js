@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react'
 import { useRouter } from 'next/router'
+import { connect} from 'react-redux'
 import axios from 'axios'
 import Jsona from 'jsona'
 import Navbar from '../../../components/layout/Navbar'
@@ -8,8 +9,9 @@ import { useGlobalContext } from '../../../context'
 import { Btn } from '../../../components/formComponents'
 import Modal from '../../../components/modal'
 import JobApplicantForm from '../../../components/jobApplicantForm'
+import { createNewJobApplicant } from '../../../redux/actions/jobApplicantAction'
 
-const HiringCampaign = () => {
+const HiringCampaign = ({ createNewJobApplicant }) => {
   const router = useRouter()
   const { id } = router.query
   const dataFormatter = new Jsona()
@@ -19,13 +21,14 @@ const HiringCampaign = () => {
   const creatingNew = () => setCreateNew(true)
   const [errors, setErrors] = useState({})
   const [jobApplicant, setJobApplicant] = useState({})
+  const [jobApplication, setJobApplication] = useState({hiring_campaign_id: id})
 
   useEffect(() => {
     const fetchHiringCampaign = async () => {
       try {
         const response = await axios.get(
           `${process.env.NEXT_PUBLIC_REMOTE_URL}/api/v1/hiring_campaign/${id}.json`,
-          { headers: { Authorization: localStorage.token } },
+          // { headers: { Authorization: localStorage.token } },
         )
         setHiringCampaign(dataFormatter.deserialize(response.data))
       } catch (error) {
@@ -37,68 +40,53 @@ const HiringCampaign = () => {
   }, [])
 
   const checkIfFormIsValid = () => {
-        let errorCount = 0;
-        [
-            'first_name',
-            'last_name',
-            'email',
-            'referrer_id',
-            'primary_phone_number',
-            'secondary_phone_number',
-        ].forEach((field) => {
-            if (jobApplicant[field] === undefined) {
-                errorCount += 1
-                errors[field] = "Can't be blank."
-                setErrors({ ...errors })
-            }
-        })
+    let errorCount = 0;
+    [
+      'first_name',
+      'last_name',
+      'email',
+      'primary_phone_number',
+      'secondary_phone_number',
+    ].forEach((field) => {
+        if (jobApplicant[field] === undefined) {
+            errorCount += 1
+            errors[field] = "Can't be blank."
+            setErrors({ ...errors })
+        }
+    })
+
+    const file = document.querySelector("#file-upload").files[0]
+    if (file === undefined) {
+      setErrors({ ...errors, cv: "can't be blank" })
+      errorCount += 1
+    }
+
+    if (file !== undefined) {
+      if (file.type !== "application/pdf") {
+        setErrors({ ...errors })
+        errorCount += 1
+        errors.cv = "Only pdf"
+      }
+    }
+
          return errorCount
     }
 
   // create new hiring campaign
   const createJobApplicant = async () => {
-    const formData = new FormData()
-
-    Object.keys(jobApplicant).forEach(field => {
-       formData.append(`job_applicant[${field}]`, jobApplicant[field])
-    });
-
-      formData.append('cv', document.querySelector("#file-upload").files[0])
     if (checkIfFormIsValid() === 0) {
-      try {
-        const response = await axios.post(
-          `${process.env.NEXT_PUBLIC_REMOTE_URL}/api/v1/job_applicant`,
-            formData,
-          {
-            headers: {
-              Authorization: localStorage.token,
-              'Content-Type': 'multipart/form-data',
-            },
-          },
-        )
-        window.location.reload()
-        if (response.statusText === 'OK') {
-          setJobApplicant([
-            dataFormatter.deserialize(response.data),
-            ...jobApplicant,
-          ])
-        }
-      }
-
-      catch (error) {
-        console.log(error);
-      }
+      createNewJobApplicant(jobApplicant, jobApplication)
+      setCreateNew(false)
     }
   }
 
-const updateJobApplicant = (e) => {
+  const updateJobApplicant = (e) => {
     delete errors[e.target.name]
     if(
       !([
           'first_name',
           'last_name',
           'email',
-          'referrer_id',
           'primary_phone_number',
           'secondary_phone_number',
       ].includes(e.target.name))
@@ -106,6 +94,23 @@ const updateJobApplicant = (e) => {
       setErrors({ ...errors, [e.target.name]: "can't be blank." })
     }
       setJobApplicant({ ...jobApplicant, [e.target.name]: e.target.value })
+}
+
+  const updateJobApplication = (e) => {
+    delete errors[e.target.name]
+    setJobApplication({ ...jobApplication, [e.target.name]: e.target.value })
+  }
+
+  const updateCv = (e) => {
+    const file = document.querySelector("#file-upload").files[0]
+    if (file !== undefined) {
+      if (file.type !== "application/pdf")
+      setErrors({ ...errors, [e.target.name]: "only pdf" })
+    }
+  }
+
+  const updateReferrer = (e) => {
+    setJobApplicant({ ...jobApplicant, [e.target.name]: e.target.value })
   }
 
   return (
@@ -147,6 +152,11 @@ const updateJobApplicant = (e) => {
             errors={errors}
             jobApplicant={jobApplicant}
             updateJobApplicant={updateJobApplicant}
+            jobApplication={jobApplication}
+            setJobApplication={setJobApplication}
+            updateJobApplication={updateJobApplication}
+            updateCv={updateCv}
+            updateReferrer={updateReferrer}
           />
         </Modal>
       )}
@@ -154,4 +164,5 @@ const updateJobApplicant = (e) => {
   )
 }
 
-export default HiringCampaign
+export default connect(() => ({}), { createNewJobApplicant })(HiringCampaign)
+
