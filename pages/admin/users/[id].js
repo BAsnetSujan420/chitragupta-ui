@@ -23,6 +23,7 @@ const User = ({ fetchUser, fetchAllSalaries, currentUser, user, salaries }) => {
   )
   const [status, setStatus] = useState(null)
   const [errors, setErrors] = useState({})
+
   const router = useRouter()
   const { id: user_id } = router.query
 
@@ -35,6 +36,28 @@ const User = ({ fetchUser, fetchAllSalaries, currentUser, user, salaries }) => {
     { id: 1, status: 'active' },
     { id: 2, status: 'disabled' },
   ]
+
+  const handleAvatarSubmit = async () => {
+    const formData = new FormData()
+    const imguser = document.querySelector('#avatarUser')
+
+    formData.append('user[avatar]', imguser.files[0])
+
+    try {
+      await axios.put(
+        `${process.env.NEXT_PUBLIC_REMOTE_URL}/api/v1/users/${user_id}.json`,
+        formData,
+        {
+          headers: {
+            'Content-Type': 'multipart/form-data',
+            Authorization: localStorage.token,
+          },
+        },
+      )
+    } catch (error) {
+      console.log(error)
+    }
+  }
 
   const leave_percentage = (leave_balance, total) =>
     user ? Math.round((leave_balance / total) * 100) : 0
@@ -113,14 +136,32 @@ const User = ({ fetchUser, fetchAllSalaries, currentUser, user, salaries }) => {
             <div>
               <img
                 className="w-20 h-20 mx-auto rounded-full lg:w-24 lg:h-24"
-                src="https://images.unsplash.com/photo-1519244703995-f4e0f30006d5?ixlib=rb-=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=facearea&facepad=8&w=1024&h=1024&q=80"
-                alt=""
+                src={`${process.env.NEXT_PUBLIC_REMOTE_URL}/rails${user.avatar_url}`}
               />
               <div>
                 <div className="my-5 text-xs font-medium lg:text-sm">
                   <h2 className="text-2xl">
                     {user && `${user.first_name} ${user.last_name}`}
                   </h2>
+
+                  {
+                    (currentUser?.id == user.id) &&
+                    <Btn
+                      className="mr-4 bg-gray-500 hover:bg-gray-400"
+                      onClick={() =>
+                        document.getElementById('avatarUser').click()
+                      }
+                    >
+                      Change Image
+                    </Btn>
+                  }
+                  <Input
+                    id="avatarUser"
+                    type="file"
+                    accept="image/*"
+                    style={{ display: 'none' }}
+                    onChange={handleAvatarSubmit}
+                  />
                 </div>
                 <div className="w-full my-4 border-b-2" />
               </div>
@@ -313,7 +354,11 @@ const User = ({ fetchUser, fetchAllSalaries, currentUser, user, salaries }) => {
 }
 
 export default connect(
-  (state) => ({ currentUser: state.auth.user, user: state.users.user, salaries: state.records.records }),
+  (state) => ({
+    currentUser: state.auth.user,
+    user: state.users.user,
+    salaries: state.records.records,
+  }),
   {
     fetchUser,
     fetchAllSalaries,
