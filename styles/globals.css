@@ -11,3 +11,11 @@ th:not(:last-child) {
 tr:nth-child(even) {
   background-color: rgb(240, 240, 240);
 }
+
+.not-found {
+  text-align: center;
+}
+.not-found a{
+  color: #4979ff;
+  text-decoration: underline;
+}

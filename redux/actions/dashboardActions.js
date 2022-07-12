@@ -136,3 +136,51 @@ export const fetchOvertimes = () => (dispatch, getState) => {
       )
     })
 }
+
+export const fetchYearlySalary = () => (dispatch, getState) => {
+  dispatch(setLoadingState(true))
+
+  axios
+    .get(
+      `${process.env.NEXT_PUBLIC_REMOTE_URL}/api/v1/yearly_salary_records.json`,
+      tokenConfig(getState),
+    )
+    .then((res) => {
+      dispatch({
+        type: GET_RECORDS,
+        payload: res.data,
+      })
+    })
+    .catch((err) => {
+      dispatch(
+        returnErrors(
+          err.response && err.response.data,
+          err.response && err.response.status,
+        ),
+      )
+    })
+}
+
+export const fetchSecretSantaSeason = () => (dispatch, getState) => {
+  dispatch(setLoadingState(true))
+
+  axios
+    .get(
+      `${process.env.NEXT_PUBLIC_REMOTE_URL}/api/v1/secret_santa_seasons.json`,
+      tokenConfig(getState),
+    )
+    .then((res) => {
+      dispatch({
+        type: GET_RECORDS,
+        payload: res.data,
+      })
+    })
+    .catch((err) => {
+      dispatch(
+        returnErrors(
+          err.response && err.response.data,
+          err.response && err.response.status,
+        ),
+      )
+    })
+}

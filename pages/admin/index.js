@@ -4,6 +4,7 @@ import Card from '../../components/card'
 import Navbar from '../../components/layout/Navbar'
 import { Btn } from '../../components/formComponents'
 import Loader from '../../components/ui/loader'
+import { useEffect } from 'react'
 
 const Admin = ({ user, loading }) => {
   const adminPages = [
@@ -36,7 +37,17 @@ const Admin = ({ user, loading }) => {
       topic: 'Invite User',
       description: 'Invite new users to the organization',
       link: '/users/invite_form',
-    }
+    },
+    {
+      topic: 'Yearly Salary',
+      description: 'Generate new yearly salary records',
+      link: '/admin/YearlySalary',
+    },
+    {
+      topic: 'Secret Santa Season',
+      description: 'Generate new secret santa season',
+      link: '/admin/secretSantaSeason',
+    },
   ]
 
   return user && !loading && user.role === 'admin' ? (
@@ -63,6 +74,6 @@ const Admin = ({ user, loading }) => {
 
 const mapStateToProps = (state) => ({
   user: state.auth.user,
-  loading: state.auth.loading,
+  loading: state.auth.isLoading,
 })
 export default connect(mapStateToProps)(Admin)
