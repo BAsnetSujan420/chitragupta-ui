@@ -13,8 +13,6 @@ import {
 } from '../../redux/actions/deviceTypeActions'
 import InputWithLabelAndError from '../InputWithLabelAndError'
 
-import axios from 'axios'
-
 function DeviceTypesDataTable({
   fetchDeviceTypes,
   createDeviceType,
@@ -36,7 +34,6 @@ function DeviceTypesDataTable({
         setErrors({ ...errors })
       }
     })
-
     return errorCount
   }
 
@@ -55,7 +52,6 @@ function DeviceTypesDataTable({
   }
 
   function deleteDeviceType() {
-    // console.log('hello')
     remoteDestroyDeviceType(deviceType)
     setDeviceType({ ...deviceType })
   }
@@ -150,7 +146,7 @@ function DeviceTypesDataTable({
               }
             }}
           >
-            Submit
+            Update
           </Btn>
           <Btn
             className="bg-red-500 hover:bg-red-600"

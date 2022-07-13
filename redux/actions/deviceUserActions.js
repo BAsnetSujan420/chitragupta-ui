@@ -50,7 +50,7 @@ export const remoteUpdateDeviceUser =
         returnAlerts(
           'Successfully updated a device user',
           response.status,
-          'RECORD_CREATION_SUCCESS',
+          'RECORD_UPDATION_SUCCESS',
         ),
       )
     } catch (error) {

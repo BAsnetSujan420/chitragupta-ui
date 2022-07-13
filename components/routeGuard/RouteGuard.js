@@ -1,7 +1,11 @@
 import { useRouter } from 'next/router'
 import { connect } from 'react-redux'
 import { useEffect } from 'react'
-import { loadUser, setToken, resetRedirect } from '../../redux/actions/authActions'
+import {
+  loadUser,
+  setToken,
+  resetRedirect,
+} from '../../redux/actions/authActions'
 
 const RouteGuard = (props) => {
   const router = useRouter()
@@ -34,7 +38,7 @@ const RouteGuard = (props) => {
     if (token) {
       props.setToken(token)
     }
-    if(props.redirect) {
+    if (props.redirect) {
       const { redirect } = props
 
       router.push(redirect)
@@ -60,4 +64,6 @@ const mapStateToProps = (state) => ({
   user: state.auth.user,
   redirect: state.auth.redirect,
 })
-export default connect(mapStateToProps, { loadUser, setToken, resetRedirect })(RouteGuard)
+export default connect(mapStateToProps, { loadUser, setToken, resetRedirect })(
+  RouteGuard,
+)

@@ -57,7 +57,7 @@ function DeviceUsersDataTable({
     fetchUsers()
   }, [])
 
-  useEffect(() => console.log(deviceUser), [deviceUser])
+  // useEffect(() => console.log(deviceUser), [deviceUser])
 
   const checkIfFormIsValid = () => {
     let errorCount = 0
@@ -90,7 +90,6 @@ function DeviceUsersDataTable({
   }
 
   const updateDeviceUser = (e) => {
-    // console.log(e)
     delete errors[e.target.name]
     setDeviceUser({ ...deviceUser, [e.target.name]: e.target.value })
   }
@@ -115,7 +114,6 @@ function DeviceUsersDataTable({
         </div>
         <DataTable
           rowClick={(row) => {
-            console.log(row.original)
             setDeviceUser(row.original)
             setUpdatingDeviceUser(true)
           }}
@@ -320,7 +318,7 @@ function DeviceUsersDataTable({
               }
             }}
           >
-            Submit
+            Update
           </Btn>
         </Modal>
       )}
