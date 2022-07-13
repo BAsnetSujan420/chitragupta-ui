@@ -5,7 +5,7 @@ export const columns = [
     id: 'device_type',
     Cell: ({ row }) => {
       const { device_type } = row.original
-      return device_type.device_type
+      return device_type ? device_type.device_type : 'N/A'
     },
   },
 
@@ -13,10 +13,12 @@ export const columns = [
     Header: 'Identifier',
     accessor: 'identifier',
   },
+
   {
     Header: 'Status',
     accessor: 'status',
   },
+
   {
     Header: 'Image',
     accessor: 'image_links',
