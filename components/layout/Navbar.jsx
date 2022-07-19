@@ -14,11 +14,13 @@ const Navbar = (props) => {
   const [showDropdown, setShowDropDown] = useState(false);
 
   const isAdmin = () => props.user && props.user.role === 'admin';
+  const isUser = () => props.user && props.user.role === 'user'
 
   const page = { label: 'Dashboard', link: '/' };
   const subPages = [{ label: 'Calendar', link: '/calendar' }];
 
   if (isAdmin()) subPages.push({ label: 'Admin', link: '/admin' });
+  if (isUser()) subPages.push({ label: 'User', link: '/userinfo' })
 
   const router = useRouter();
 
@@ -52,6 +54,7 @@ const Navbar = (props) => {
 
           {showDropdown && (
             <DropdownMenu>
+              <DropdownItem href ={`admin/users/${props.currentUser?.id}`}>View Profile</DropdownItem>
               <DropdownItem onClick={handleLogout}>Logout</DropdownItem>
               <DropdownItem href={`/admin/users/${props.user.id}`}>
                   Profile
@@ -137,12 +140,13 @@ const Navbar = (props) => {
         </ol>
       </nav>
     </header>
-  ) : null;
+  ) : null
 }
 
 const mapStateToProps = (state) => ({
+  currentUser: state.auth.user,
   token: state.auth.token,
   user: state.auth.user,
   error: state.error,
-});
+})
 export default connect(mapStateToProps, { logout })(Navbar);
