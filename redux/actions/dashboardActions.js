@@ -7,7 +7,7 @@ import {
   SET_BATCH,
   LEAVE_REQUESTS_LOADING,
   GET_RECORDS,
-  SHOW_MODAL
+  SHOW_MODAL,
 } from './types'
 
 export const setShowModal = (modal) => (dispatch) => {
@@ -95,6 +95,102 @@ export const fetchSalaryRecords = () => (dispatch, getState) => {
   axios
     .get(
       `${process.env.NEXT_PUBLIC_REMOTE_URL}/api/v1/salary_records.json`,
+      tokenConfig(getState),
+    )
+    .then((res) => {
+      dispatch({
+        type: GET_RECORDS,
+        payload: res.data,
+      })
+    })
+    .catch((err) => {
+      dispatch(
+        returnErrors(
+          err.response && err.response.data,
+          err.response && err.response.status,
+        ),
+      )
+    })
+}
+
+export const fetchDeviceTypes = () => (dispatch, getState) => {
+  dispatch(setLoadingState(true))
+
+  axios
+    .get(
+      `${process.env.NEXT_PUBLIC_REMOTE_URL}/api/v1/device_types.json`,
+      tokenConfig(getState),
+    )
+    .then((res) => {
+      dispatch({
+        type: GET_RECORDS,
+        payload: res.data,
+      })
+    })
+    .catch((err) => {
+      dispatch(
+        returnErrors(
+          err.response && err.response.data,
+          err.response && err.response.status,
+        ),
+      )
+    })
+}
+
+export const fetchDevices = () => (dispatch, getState) => {
+  dispatch(setLoadingState(true))
+
+  axios
+    .get(
+      `${process.env.NEXT_PUBLIC_REMOTE_URL}/api/v1/devices.json`,
+      tokenConfig(getState),
+    )
+    .then((res) => {
+      dispatch({
+        type: GET_RECORDS,
+        payload: res.data,
+      })
+    })
+    .catch((err) => {
+      dispatch(
+        returnErrors(
+          err.response && err.response.data,
+          err.response && err.response.status,
+        ),
+      )
+    })
+}
+
+export const fetchDeviceUsers = () => (dispatch, getState) => {
+  dispatch(setLoadingState(true))
+
+  axios
+    .get(
+      `${process.env.NEXT_PUBLIC_REMOTE_URL}/api/v1/device_users.json`,
+      tokenConfig(getState),
+    )
+    .then((res) => {
+      dispatch({
+        type: GET_RECORDS,
+        payload: res.data,
+      })
+    })
+    .catch((err) => {
+      dispatch(
+        returnErrors(
+          err.response && err.response.data,
+          err.response && err.response.status,
+        ),
+      )
+    })
+}
+
+export const fetchDeviceManagers = () => (dispatch, getState) => {
+  dispatch(setLoadingState(true))
+
+  axios
+    .get(
+      `${process.env.NEXT_PUBLIC_REMOTE_URL}/api/v1/device_managers.json`,
       tokenConfig(getState),
     )
     .then((res) => {

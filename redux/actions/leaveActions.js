@@ -60,10 +60,6 @@ export const fetchLeaveRequests = () => (dispatch, getState) => {
     )
     .then((res) => {
       dispatch({
-        type: GET_LEAVE_REQUESTS,
-        payload: dataFormatter.deserialize(res.data.data),
-      })
-      dispatch({
         type: GET_RECORDS,
         payload: res.data,
       })

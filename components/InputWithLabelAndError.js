@@ -1,6 +1,6 @@
-import { Label, Input } from './formComponents';
+import { Label, Input } from './formComponents'
 
-const InputWithLabelAndError = ({ name, errors, value, onChange }) => (
+const InputWithLabelAndError = ({ name, errors, value, onChange, type }) => (
     <div className="w-full pr-4 mb-4 md:w-1/2">
         <Label
             className={`${
@@ -13,12 +13,13 @@ const InputWithLabelAndError = ({ name, errors, value, onChange }) => (
             name={name}
             value={value}
             onChange={onChange}
-            className={errors[name] ? 'border-red-500' : ''}
-        />
-        {errors[name] && (
-            <span className="text-sm text-red-500">{errors[name]}</span>
-        )}
+            type={type}
+        className={errors[name] ? 'border-red-500' : ''}
+      />
+      {errors[name] && (
+        <span className="text-sm text-red-500">{errors[name]}</span>
+      )}
     </div>
 )
 
-export default InputWithLabelAndError;
+export default InputWithLabelAndError

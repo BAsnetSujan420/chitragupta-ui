@@ -33,6 +33,26 @@ const Admin = ({ user, loading }) => {
       link: '/admin/overtimes',
     },
     {
+      topic: 'Device Types',
+      description: 'View and manage device types',
+      link: '/admin/deviceTypes',
+    },
+    {
+      topic: 'Devices',
+      description: 'View and manage devices',
+      link: '/admin/devices',
+    },
+    {
+      topic: 'Device Users',
+      description: 'View and manage device users',
+      link: '/admin/deviceUsers',
+    },
+    {
+      topic: 'Device Managers',
+      description: 'View and manage device managers',
+      link: '/admin/deviceManagers',
+    },
+    {
       topic: 'Invite User',
       description: 'Invite new users to the organization',
       link: '/users/invite_form',
